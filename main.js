@@ -1,24 +1,29 @@
 import { senators } from './senators.js'
 import { representatives } from './representatives.js'
 
-// filter examples
-
-const democrats = representatives.filter(senator => {
-  return senator.party === 'D'
-})
-
-const republicans = representatives.filter(senator => senator.party === 'R')
-
-console.log(democrats, republicans)
-
 // map example - simplify the object returned from the map function by just creating two properties for each one
 
-const simpleReps = representatives.map(rep => {
+const democratSenators = senators.map(rep => {
   return {
     name: `${rep.first_name} ${rep.last_name}`,
     facebook: rep.facebook_account,
+    imgURL: `https://www.congress.gov/img/member/${rep.id.toLowerCase()}.jpg`,
+    party: rep.party
   }
-})
+}).filter(senator => senator.party === 'D')
+
+const republicanSenators = senators.map(rep => {
+  return {
+    name: `${rep.first_name} ${rep.last_name}`,
+    facebook: rep.facebook_account,
+    imgURL: `https://www.congress.gov/img/member/${rep.id.toLowerCase()}.jpg`,
+    party: rep.party
+  }
+}).filter(senator => senator.party === 'R')
+
+// filter examples
+
+//console.log(democrats, republicans)
 
 // reduce example
 
@@ -40,22 +45,42 @@ const allMissedVotes = representatives.reduce((acc, rep) => {
 console.log(testResults, allVotes, allMissedVotes)
 
 const senWithPics = senators.map(senator => {
-  senator.imgURL = `https://www.congress.gov/img/member/${senator.id.toLowerCase()}.jpg`
+  
   return senator
 })
 
 // now set up some UI elements to display the senator pictures
-  let pictureDiv = document.querySelector('.container')
+  const pictureDiv = document.querySelector('.container')
 
-  senWithPics.forEach(senator => {
+  const removeCards = (() => {
+    while(pictureDiv.firstChild) {
+      pictureDiv.removeChild(pictureDiv.firstChild)
+    }
+  })
+
+  function renderPictures(peopleArray) {
+    peopleArray.forEach(senator => {
     let senatorPic = document.createElement('img')
     let senatorFig = document.createElement('figure')
     let senatorCap = document.createElement('figcaption')
-    senatorCap.textContent = `${senator.first_name} ${senator.last_name}`
+    senatorCap.textContent = `${senator.name}`
     senatorPic.src = senator.imgURL
     senatorFig.appendChild(senatorPic)
     senatorFig.appendChild(senatorCap)
     pictureDiv.appendChild(senatorFig)
   })
+  }
 
+  const rBtn = document.querySelector('#republicanBtn')
+  const dBtn = document.querySelector('#democratBtn')
+
+  rBtn.addEventListener('click', function() {
+    removeCards()
+    renderPictures(republicanSenators)
+  })
+
+  dBtn.addEventListener('click', function() {
+    removeCards()
+    renderPictures(democratSenators)
+  })
 
